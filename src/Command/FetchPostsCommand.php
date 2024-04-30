@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Post;
 
 #[AsCommand(
     name: 'app:fetch-posts',
@@ -18,10 +20,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class FetchPostsCommand extends Command
 {
     private $httpClient;
+    private $entityManager;
 
-    public function __construct(HttpClientInterface $httpClient)
+    public function __construct(HttpClientInterface $httpClient, EntityManagerInterface $entityManager)
     {
         $this->httpClient = $httpClient;
+        $this->entityManager = $entityManager;
 
         parent::__construct();
     }
@@ -58,6 +62,19 @@ class FetchPostsCommand extends Command
         }
 
         $output->writeln(sprintf('Fetched %d posts.', count($consolidatedPosts)));
+
+        foreach ($consolidatedPosts as $consolidatedPost) {
+            $newPost = new Post();
+            $newPost->setUserId($consolidatedPost['userId']); // Ustawienie user_id
+            $newPost->setUserName($consolidatedPost['user_name']);
+            $newPost->setTitle($consolidatedPost['title']);
+            $newPost->setBody($consolidatedPost['body']);
+
+            $this->entityManager->persist($newPost);
+        }
+
+        $this->entityManager->flush();
+
         return Command::SUCCESS;
     }
 }
