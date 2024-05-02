@@ -1,12 +1,23 @@
 version: '3.8'
 
 services:
+  php:
+    build:
+      context: ./Docker/php
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:admin@db:5432/symfonydb
+
   db:
-    image: postgres:lateyst
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: symfony_db
+      POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
+    volumes:
+      - ./Docker/db/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh
