@@ -1,5 +1,5 @@
 # Use official PHP image as base
-FROM php:8.0-fpm
+FROM php:8.2-fpm
 
 # Set working directory in the container
 WORKDIR /var/www/html
