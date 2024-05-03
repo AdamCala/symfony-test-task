@@ -6,14 +6,14 @@ services:
       context: ./Docker/php
     volumes:
       - .:/var/www/html
-    depends_on:
+    links:
       - db
     environment:
       DATABASE_URL: postgresql://postgres:admin@db:5432/symfonydb
     ports:
       - "8080:9000"
   db:
-    image: postgres:latest
+    image: postgres:16.2
     restart: always
     environment:
       POSTGRES_USER: postgres
